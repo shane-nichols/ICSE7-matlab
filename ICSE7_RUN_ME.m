@@ -59,12 +59,4 @@ MMplot(Lam,MM_multRefl,'-y',...
     'handles',h);
 
 % Discrepency between the direct integration and the other methods is
-% proportional to the derivative of the optical functions. Although a
-% small change to delta_lam can often make them agree. Note that if you make
-% epsilon constant with wavelength, all four methods will be exacty the same. 
-% Of course, epsilon is not constant with wavelength! 
-% One possibility that we are considering is to make delta_lam a 
-% constant + an extra contribution that is proportional to the average derivative 
-% of the components of epsilon. We think that can improve agreement for 
-% transparent materials with Sellmeier-like dispersion curves. For sharp or other
-% large derivative features, better to use direct integration.
+% proportional to the derivative of the optical functions. 
