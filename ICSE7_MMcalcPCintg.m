@@ -41,7 +41,6 @@ for n = 1:length(LamLong) % inside this loop is the whole Berreman calculation
 end
 
 gaussian = exp(-(-(intWidth/2):fineStep:(intWidth/2)).^2./(2*delta_lam^2));
-plot(-(intWidth/2):fineStep:(intWidth/2),gaussian)
 sumGauss = sum(gaussian);
 lengthGauss = length(gaussian);
 if mod(lengthGauss,2)

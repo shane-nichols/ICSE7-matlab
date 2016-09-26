@@ -13,9 +13,10 @@ function handles = MMplot(Lam,MMdata,varargin)
 %   LineSpec: string containing a valid lineSpec. Type "doc LineSpec" in
 %       command window for more info. Default is "-", a solid line.
 % Optional Name-Value pairs inputs:
-%   ev: bool. converts X axis to eV. e.g., 'ev',true
+%   ev: bool. converts X axis to eV. e.g., 'ev',true. Set for each call.
 %   handles: [1 x 16] array of plot handles. New handles are created if not given.
 %   limY: scalar numeric. limits how small the range of the y-axes can be.
+        % Only needs to be set on the last call to MMplot for the figure.
 %   fontsize: sets font-size. Default is 12 pts. Changing the fontsize
 %       of existing plots is not recommended. (Set on first call).
 %   lineNV: a 1D cell array containing Name-Value pair arguments valid for
