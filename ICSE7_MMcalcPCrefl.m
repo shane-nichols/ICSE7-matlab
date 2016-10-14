@@ -55,8 +55,9 @@ for n = 1:length(Lam) % inside this loop is the whole Berreman calculation
     R10 = Int10([1,2],[3,4])*T10;
     tau = sum(abs(Kdiag))*d/2;
     
-    Q = R10*P2*R12*P1;
-    D = T10*P2*R12*P1;
+    temp = P2*R12*P1;
+    Q = R10*temp;
+    D = T10*temp;
     B = T12*P1;
     
     cohVals = ones(1,m_max+1);

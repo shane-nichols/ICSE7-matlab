@@ -8,15 +8,14 @@ function handles = MMplot(Lam,MMdata,varargin)
 %
 % Required positional inputs:
 %   Lam: [1 x n] array of wavelengths (X-axis)
-%   MMdata: [4 x 4 x n] Mueller matrix array
+%   MMdata: [4 x 4 x n x ...] Mueller matrix array
 % Optional positional inputs:
 %   LineSpec: string containing a valid lineSpec. Type "doc LineSpec" in
 %       command window for more info. Default is "-", a solid line.
 % Optional Name-Value pairs inputs:
-%   ev: bool. converts X axis to eV. e.g., 'ev',true. Set for each call.
+%   ev: bool. converts X axis to eV. e.g., 'ev',true
 %   handles: [1 x 16] array of plot handles. New handles are created if not given.
 %   limY: scalar numeric. limits how small the range of the y-axes can be.
-        % Only needs to be set on the last call to MMplot for the figure.
 %   fontsize: sets font-size. Default is 12 pts. Changing the fontsize
 %       of existing plots is not recommended. (Set on first call).
 %   lineNV: a 1D cell array containing Name-Value pair arguments valid for
@@ -28,11 +27,16 @@ function handles = MMplot(Lam,MMdata,varargin)
 %       size minus the height of the OSX status bar (on my machine). 
 %       Default size is [1000 700].
 %   title: string containing a title to place at the top of the figure.
+%   legend: two-element cell array. First element is a string to use for
+%       title of the legend. Second element is either a numeric array 
+%       containing values to use for labels of each plot, or a cell array
+%       of strings to use as labels. Only set legend on last call, or just
+%       write all plots at once (better).
 
 p = inputParser;
 % input validation functions
 valFun1 = @(x) ischar(x) && ...
-    all(~strcmpi(x,{'ev','handles','lineNV','limY','fontsize','axNV','size','title'}));
+    all(~strcmpi(x,{'ev','handles','lineNV','limY','fontsize','axNV','size','title','legend'}));
 valFun2 = @(x) isscalar(x)&&isnumeric(x);
 % setup input scheme
 addRequired(p,'Lam',@isnumeric);
@@ -46,6 +50,7 @@ addParameter(p,'axNV',{},@iscell)
 addParameter(p,'lineNV',{},@iscell)
 addParameter(p,'size',[1000 700],@(x) length(x) == 2 && isnumeric(x))
 addParameter(p,'title','',@ischar)
+addParameter(p,'legend',{},@iscell)
 parse(p,Lam,MMdata,varargin{:}) %parse inputs
 
 % create new figure if no valid handles were given
@@ -64,7 +69,7 @@ if all(handles == 0) || length(handles) ~= 16
         warning(['Figure vertical dimension set to the maximum value of ',...
             num2str(figPos(4)),' pixels.'])
     end
-    figure('position',figPos,'units','pixels') %create figure
+    h_fig = figure('position',figPos,'units','pixels'); %create figure
     xLabel = uicontrol('style','text','BackgroundColor','w',...
         'units','pixels','FontSize',p.Results.fontsize); % create x-label
     if p.Results.ev == true
@@ -106,14 +111,15 @@ if all(handles == 0) || length(handles) ~= 16
         end
     end
 else
-    figPos = get(get(handles(1),'parent'),'Position');
+    h_fig = get(handles(1),'parent');
+    figPos = get(h_fig,'Position');
 end
 
 %plot data and set Line properties.
 if p.Results.ev == true; Lam = 1239.8./Lam; end
 for j = 1:4
     for k = 1:4
-        plot(handles(k+4*(j-1)),Lam,squeeze(MMdata(j,k,:)),...
+        plot(handles(k+4*(j-1)),Lam,squeeze(MMdata(j,k,:,:)),...
             p.Results.LineSpec,p.Results.lineNV{:})
     end
 end
@@ -155,4 +161,22 @@ end
 if ~any(strcmpi('fontsize',p.UsingDefaults))
     set(get(gcf,'children'),'FontSize',p.Results.fontsize);
 end
+% optionally create legend (this will increase the width of the figure!)
+if ~any(strcmpi('legend',p.UsingDefaults))
+    Labels = p.Results.legend{2};
+    if isnumeric(Labels); Labels = strread(num2str(Labels),'%s'); end
+    for i=1:16
+        set(handles(i),'units','pixels');
+        pos(:,i) = get(handles(i),'Position');
+    end
+    lgd = legend(handles(4),Labels,'location','northeastoutside');
+    set(lgd,'units','pixels','fontsize',p.Results.fontsize);
+    title(lgd,p.Results.legend{1},'FontSize',p.Results.fontsize);
+    lgd_pos = get(lgd,'Position');
+    h_fig.Position = h_fig.Position + [0 0 lgd_pos(3) 0];
+    for i=1:16
+        set(handles(i),'Position',pos(:,i));
+    end
+end
+
 end
