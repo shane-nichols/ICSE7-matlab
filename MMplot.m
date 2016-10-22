@@ -43,7 +43,7 @@ addRequired(p,'Lam',@isnumeric);
 addRequired(p,'MMdata',@isnumeric);
 addOptional(p,'LineSpec','-',valFun1)
 addParameter(p,'ev',false,@islogical)
-addParameter(p,'handles',0, @(x) all(ishandle(x)))
+addParameter(p,'handles',gobjects(1,16), @(x) all(ishandle(x)))
 addParameter(p,'limY',0,valFun2)
 addParameter(p,'fontsize',12,valFun2)
 addParameter(p,'axNV',{},@iscell)
@@ -55,7 +55,7 @@ parse(p,Lam,MMdata,varargin{:}) %parse inputs
 
 % create new figure if no valid handles were given
 handles = p.Results.handles;
-if all(handles == 0) || length(handles) ~= 16
+if any(strcmpi('handles',p.UsingDefaults))
     % Determine how large to make the figure window, according to the screensize.
     scrsz = get(0,'screensize');
     figPos = [1 5 p.Results.size];
